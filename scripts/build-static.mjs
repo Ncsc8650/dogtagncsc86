@@ -33,7 +33,7 @@ async function buildEmbeddedWorker() {
 
   const binaryFiles = {
     "/assets/images/003.png": ["assets/images/003.png", "image/png"],
-    "/assets/images/B.png": ["assets/images/B.png", "image/png"],
+    "/assets/images/B-normalized.png": ["assets/images/B-normalized.png", "image/png"],
     "/assets/images/131574.jpg": ["assets/images/131574.jpg", "image/jpeg"],
     "/assets/fonts/Kanit-Regular.ttf": ["assets/fonts/Kanit-Regular.ttf", "font/ttf"],
     "/assets/fonts/Kanit-SemiBold.ttf": ["assets/fonts/Kanit-SemiBold.ttf", "font/ttf"],

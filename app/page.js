@@ -74,7 +74,7 @@ export default function Page() {
                 <img src="/assets/images/003.png" alt="Dog tag front" />
               </div>
               <div className="tag-face tag-back">
-                <img src="/assets/images/B.png" alt="Dog tag back" />
+                <img src="/assets/images/B-normalized.png" alt="Dog tag back" />
                 <div className="engrave-preview" aria-hidden="true">
                   <strong data-preview="rankName">ชื่อ</strong>
                   <strong data-preview="surname">นามสกุล</strong>

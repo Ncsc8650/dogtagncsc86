@@ -1,9 +1,9 @@
-const GOOGLE_SCRIPT_URL = "";
+const GOOGLE_SCRIPT_URL = window.NCSC_GOOGLE_SCRIPT_URL || "";
 const STORAGE_KEY = "ncsc86-dogtag-orders";
 
 const imagePaths = {
   front: "/assets/images/003.png",
-  back: "/assets/images/B.png",
+  back: "/assets/images/B-normalized.png",
 };
 
 const form = document.querySelector("#orderForm");
@@ -49,6 +49,10 @@ function init() {
   updatePreview();
   renderOrders();
   loadRemoteOrders();
+  if (!GOOGLE_SCRIPT_URL) {
+    statusText.textContent = "ยังไม่ได้เชื่อม Google Sheets: ตอนนี้ข้อมูลจะอยู่เฉพาะในเครื่องนี้";
+    statusText.classList.add("error");
+  }
   bindEvents();
 
   if (window.lucide) {
@@ -151,7 +155,8 @@ async function saveOrder(event) {
     await loadRemoteOrders();
     statusText.textContent = `บันทึกแล้ว รหัสลับ ${order.secretCode}`;
   } else {
-    statusText.textContent = `บันทึกในเครื่องแล้ว รหัสลับ ${order.secretCode}`;
+    statusText.textContent = `ยังไม่เข้า Google Sheets: บันทึกเฉพาะในเครื่องนี้ รหัสลับ ${order.secretCode}`;
+    statusText.className = "status-text error";
   }
 
   openOrderDialog(order);
@@ -204,11 +209,11 @@ function drawEngraving(ctx, canvas, data) {
     `Blood group: ${data.bloodGroup}`,
   ];
 
-  const x = canvas.width * 0.285;
-  const startY = canvas.height * 0.39;
-  const lineHeight = canvas.height * 0.047;
+  const x = canvas.width * 0.29;
+  const startY = canvas.height * 0.335;
+  const lineHeight = canvas.height * 0.078;
   const maxWidth = canvas.width * 0.62;
-  const baseSize = Math.round(canvas.height * 0.043);
+  const baseSize = Math.round(canvas.height * 0.055);
 
   ctx.fillStyle = "#020202";
   ctx.textBaseline = "middle";
