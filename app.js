@@ -228,9 +228,9 @@ function drawEngraving(ctx, canvas, data) {
 
   const x = canvas.width * 0.29;
   const startY = canvas.height * 0.335;
-  const lineHeight = canvas.height * 0.078;
+  const lineHeight = canvas.height * 0.086;
   const maxWidth = canvas.width * 0.62;
-  const baseSize = Math.round(canvas.height * 0.055);
+  const baseSize = Math.round(canvas.height * 0.064);
 
   ctx.fillStyle = "#020202";
   ctx.textBaseline = "middle";
