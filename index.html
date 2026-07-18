@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NCSC86 Dog Tag Order</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workbench" aria-label="Dog tag order form">
+        <div class="brand-lockup">
+          <span>NCSC86</span>
+          <h1>Dog Tag Order</h1>
+        </div>
+
+        <form id="orderForm" class="order-form" autocomplete="off">
+          <div class="field">
+            <label for="rankName">ยศ - ชื่อ</label>
+            <input id="rankName" name="rankName" type="text" maxlength="36" placeholder="เช่น ร.ต. สมชาย" required />
+          </div>
+
+          <div class="field">
+            <label for="surname">นามสกุล</label>
+            <input id="surname" name="surname" type="text" maxlength="36" placeholder="นามสกุล" required />
+          </div>
+
+          <div class="field">
+            <label for="serviceNumber">เลขอัตราข้าราชการ</label>
+            <input id="serviceNumber" name="serviceNumber" type="text" inputmode="numeric" maxlength="18" placeholder="เลขอัตราข้าราชการ" required />
+          </div>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="ncscNumber">NCSC NO.</label>
+              <select id="ncscNumber" name="ncscNumber" required></select>
+            </div>
+            <div class="field">
+              <label for="bloodGroup">หมู่เลือด</label>
+              <select id="bloodGroup" name="bloodGroup" required>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="O">O</option>
+                <option value="AB">AB</option>
+              </select>
+            </div>
+          </div>
+
+          <input id="secretCode" name="secretCode" type="hidden" />
+
+          <div class="actions">
+            <button class="primary-button" type="submit">
+              <i data-lucide="save"></i>
+              <span>บันทึกคำสั่งทำ</span>
+            </button>
+            <button class="ghost-button" id="resetButton" type="button" title="ล้างฟอร์ม">
+              <i data-lucide="rotate-ccw"></i>
+            </button>
+          </div>
+          <p id="statusText" class="status-text" role="status"></p>
+        </form>
+      </section>
+
+      <section class="preview-zone" aria-label="Dog tag preview">
+        <div class="preview-toolbar">
+          <div class="segmented" role="tablist" aria-label="Preview side">
+            <button type="button" class="segment active" data-side="front">หน้า</button>
+            <button type="button" class="segment" data-side="back">หลัง</button>
+          </div>
+          <button class="icon-button" id="spinButton" type="button" title="หมุนแท็ก">
+            <i data-lucide="refresh-cw"></i>
+          </button>
+        </div>
+
+        <div class="tag-stage" id="tagStage">
+          <div class="tag-model" id="tagModel">
+            <div class="tag-face tag-front">
+              <img src="./assets/images/A.png" alt="Dog tag front" />
+            </div>
+            <div class="tag-face tag-back">
+              <img src="./assets/images/B.png" alt="Dog tag back" />
+              <div class="engrave-preview" aria-hidden="true">
+                <strong data-preview="rankName">ยศ ชื่อ</strong>
+                <strong data-preview="surname">นามสกุล</strong>
+                <strong data-preview="serviceNumber">0000000000</strong>
+                <strong data-preview="ncscNumber">NCSC 86 - 01</strong>
+                <strong data-preview="bloodGroup">Blood group: A</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="download-row">
+          <button class="ghost-button" id="downloadFront" type="button">
+            <i data-lucide="download"></i>
+            <span>ด้านหน้า</span>
+          </button>
+          <button class="ghost-button" id="downloadBack" type="button">
+            <i data-lucide="download"></i>
+            <span>ด้านหลัง</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="orders-panel" aria-label="Saved orders">
+        <div class="panel-title">
+          <h2>รายการที่บันทึกแล้ว</h2>
+          <div class="secret-lookup">
+            <input id="lookupCode" type="text" placeholder="รหัสลับ" />
+            <button id="lookupButton" class="icon-button" type="button" title="ดูภาพ">
+              <i data-lucide="lock-keyhole"></i>
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ชื่อ</th>
+                <th>รหัสลับ</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="imageDialog">
+      <div class="dialog-head">
+        <strong id="dialogName">Dog Tag</strong>
+        <button id="closeDialog" class="icon-button" type="button" title="ปิด">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="dialog-images">
+        <a id="dialogFront" download="dogtag-front.png">
+          <img alt="Generated dog tag front" />
+        </a>
+        <a id="dialogBack" download="dogtag-back.png">
+          <img alt="Generated dog tag back" />
+        </a>
+      </div>
+    </dialog>
+
+    <canvas id="renderCanvas" hidden></canvas>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
