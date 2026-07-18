@@ -17,7 +17,7 @@ The local server runs on `http://localhost:4173` by default.
 2. Paste the code from `scripts/google-apps-script.gs`.
 3. Deploy it as a Web app.
 4. Set `Execute as` to your account and `Who has access` to `Anyone with the link`.
-5. Copy the Web app URL into `GOOGLE_SCRIPT_URL` in `app.js`.
+5. Copy the Web app URL into `config.js` for local use, or set the Sites environment variable `NCSC_GOOGLE_SCRIPT_URL` for production.
 
 Configured Google Sheet:
 

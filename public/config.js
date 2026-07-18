@@ -1,0 +1,1 @@
+window.NCSC_GOOGLE_SCRIPT_URL = window.NCSC_GOOGLE_SCRIPT_URL || "";
