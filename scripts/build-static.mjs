@@ -13,6 +13,7 @@ await mkdir(join(dist, ".openai"), { recursive: true });
 
 await cp(join(root, "index.html"), join(client, "index.html"));
 await cp(join(root, "config.js"), join(client, "config.js"));
+await cp(join(root, "external-browser.js"), join(client, "external-browser.js"));
 await cp(join(root, "styles.css"), join(client, "styles.css"));
 await cp(join(root, "app.js"), join(client, "app.js"));
 await cp(join(root, "assets"), join(client, "assets"), { recursive: true });
@@ -29,6 +30,7 @@ async function buildEmbeddedWorker() {
   const textFiles = {
     "/index.html": ["index.html", "text/html; charset=utf-8"],
     "/config.js": ["config.js", "text/javascript; charset=utf-8"],
+    "/external-browser.js": ["external-browser.js", "text/javascript; charset=utf-8"],
     "/styles.css": ["styles.css", "text/css; charset=utf-8"],
     "/app.js": ["app.js", "text/javascript; charset=utf-8"],
   };

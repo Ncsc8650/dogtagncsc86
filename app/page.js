@@ -141,6 +141,7 @@ export default function Page() {
       </dialog>
 
       <canvas id="renderCanvas" hidden></canvas>
+      <Script src="/external-browser.js" strategy="beforeInteractive" />
       <Script src="/config.js" strategy="beforeInteractive" />
       <Script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" strategy="beforeInteractive" />
       <Script src="/app.js" strategy="afterInteractive" />
