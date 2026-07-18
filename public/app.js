@@ -227,10 +227,10 @@ function drawEngraving(ctx, canvas, data) {
   ];
 
   const x = canvas.width * 0.29;
-  const startY = canvas.height * 0.335;
-  const lineHeight = canvas.height * 0.086;
+  const startY = canvas.height * 0.295;
+  const lineHeight = canvas.height * 0.092;
   const maxWidth = canvas.width * 0.62;
-  const baseSize = Math.round(canvas.height * 0.064);
+  const baseSize = Math.round(canvas.height * 0.083);
 
   ctx.fillStyle = "#020202";
   ctx.textBaseline = "middle";
@@ -509,11 +509,11 @@ async function openSavedOrder(order) {
     backImage: order.backImage || order.backUrl || localImages?.backImage,
   };
 
-  if (!completeOrder.frontImage || !completeOrder.backImage) {
-    if (completeOrder.rankName && completeOrder.surname && completeOrder.serviceNumber && completeOrder.ncscNumber) {
-      completeOrder.frontImage = await renderDogTag("front", completeOrder);
-      completeOrder.backImage = await renderDogTag("back", completeOrder);
-    } else if (GOOGLE_SCRIPT_URL && completeOrder.secretCode) {
+  if (completeOrder.rankName && completeOrder.surname && completeOrder.serviceNumber && completeOrder.ncscNumber) {
+    completeOrder.frontImage = await renderDogTag("front", completeOrder);
+    completeOrder.backImage = await renderDogTag("back", completeOrder);
+  } else if (!completeOrder.frontImage || !completeOrder.backImage) {
+    if (GOOGLE_SCRIPT_URL && completeOrder.secretCode) {
       try {
         const remote = await jsonpRequest({ code: completeOrder.secretCode });
         if (remote.ok && remote.frontUrl && remote.backUrl) {
