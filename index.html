@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,27 +16,27 @@
 
         <form id="orderForm" class="order-form" autocomplete="off">
           <div class="field">
-            <label for="rankName">ชื่อ</label>
-            <input id="rankName" name="rankName" type="text" maxlength="36" placeholder="ชื่อ" required />
+            <label for="rankName">First Name</label>
+            <input id="rankName" name="rankName" type="text" maxlength="36" placeholder="FIRST NAME" required />
           </div>
 
           <div class="field">
-            <label for="surname">นามสกุล</label>
-            <input id="surname" name="surname" type="text" maxlength="36" placeholder="นามสกุล" required />
+            <label for="surname">Last Name</label>
+            <input id="surname" name="surname" type="text" maxlength="36" placeholder="LAST NAME" required />
           </div>
 
           <div class="field">
-            <label for="serviceNumber">เลขอัตราข้าราชการ</label>
-            <input id="serviceNumber" name="serviceNumber" type="text" inputmode="numeric" maxlength="18" placeholder="เลขอัตราข้าราชการ" required />
+            <label for="serviceNumber">Military ID</label>
+            <input id="serviceNumber" name="serviceNumber" type="text" inputmode="numeric" maxlength="18" placeholder="MILITARY ID" required />
           </div>
 
           <div class="field-grid">
             <div class="field">
-              <label for="ncscNumber">NCSC NO.</label>
+              <label for="ncscNumber">NCSC No.</label>
               <select id="ncscNumber" name="ncscNumber" required></select>
             </div>
             <div class="field">
-              <label for="bloodGroup">หมู่เลือด</label>
+              <label for="bloodGroup">Blood Group</label>
               <select id="bloodGroup" name="bloodGroup" required>
                 <option value="A">A</option>
                 <option value="B">B</option>
@@ -46,14 +46,19 @@
             </div>
           </div>
 
+          <div class="field">
+            <label for="quantity">Quantity</label>
+            <input id="quantity" name="quantity" type="text" inputmode="numeric" maxlength="3" placeholder="QUANTITY" required />
+          </div>
+
           <input id="secretCode" name="secretCode" type="hidden" />
 
           <div class="actions">
             <button class="primary-button" type="submit">
               <i data-lucide="save"></i>
-              <span>บันทึกคำสั่งทำ</span>
+              <span>Save Order</span>
             </button>
-            <button class="ghost-button" id="resetButton" type="button" title="ล้างฟอร์ม">
+            <button class="ghost-button" id="resetButton" type="button" title="Reset Form">
               <i data-lucide="rotate-ccw"></i>
             </button>
           </div>
@@ -64,10 +69,10 @@
       <section class="preview-zone" aria-label="Dog tag preview">
         <div class="preview-toolbar">
           <div class="segmented" role="tablist" aria-label="Preview side">
-            <button type="button" class="segment active" data-side="front">หน้า</button>
-            <button type="button" class="segment" data-side="back">หลัง</button>
+            <button type="button" class="segment active" data-side="front">Front</button>
+            <button type="button" class="segment" data-side="back">Back</button>
           </div>
-          <button class="icon-button" id="spinButton" type="button" title="หมุนแท็ก">
+          <button class="icon-button" id="spinButton" type="button" title="Spin Tag">
             <i data-lucide="refresh-cw"></i>
           </button>
         </div>
@@ -80,11 +85,11 @@
             <div class="tag-face tag-back">
               <img src="./assets/images/B-normalized.png" alt="Dog tag back" />
               <div class="engrave-preview" aria-hidden="true">
-                <strong data-preview="rankName">ชื่อ</strong>
-                <strong data-preview="surname">นามสกุล</strong>
+                <strong data-preview="rankName">FIRST NAME</strong>
+                <strong data-preview="surname">LAST NAME</strong>
                 <strong data-preview="serviceNumber">0000000000</strong>
                 <strong data-preview="ncscNumber">NCSC 86 - 01</strong>
-                <strong data-preview="bloodGroup">Blood group: A</strong>
+                <strong data-preview="bloodGroup">BLOOD GROUP: A</strong>
               </div>
             </div>
           </div>
@@ -93,31 +98,27 @@
         <div class="download-row">
           <button class="ghost-button" id="downloadFront" type="button">
             <i data-lucide="download"></i>
-            <span>ด้านหน้า</span>
+            <span>Front Image</span>
           </button>
           <button class="ghost-button" id="downloadBack" type="button">
             <i data-lucide="download"></i>
-            <span>ด้านหลัง</span>
+            <span>Back Image</span>
           </button>
         </div>
       </section>
 
       <section class="orders-panel" aria-label="Saved orders">
         <div class="panel-title">
-          <h2>รายการที่บันทึกแล้ว</h2>
-          <div class="secret-lookup">
-            <input id="lookupCode" type="text" placeholder="รหัสลับ" />
-            <button id="lookupButton" class="icon-button" type="button" title="ดูภาพ">
-              <i data-lucide="lock-keyhole"></i>
-            </button>
-          </div>
+          <h2>Saved Orders</h2>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>ชื่อ</th>
-                <th>รหัสลับ</th>
+                <th>Name</th>
+                <th>NCSC No.</th>
+                <th>Qty</th>
+                <th>Images</th>
               </tr>
             </thead>
             <tbody id="ordersBody"></tbody>
@@ -129,7 +130,7 @@
     <dialog id="imageDialog">
       <div class="dialog-head">
         <strong id="dialogName">Dog Tag</strong>
-        <button id="closeDialog" class="icon-button" type="button" title="ปิด">
+        <button id="closeDialog" class="icon-button" type="button" title="Close">
           <i data-lucide="x"></i>
         </button>
       </div>

@@ -20,20 +20,32 @@ function doPost(e) {
       throw new Error("Duplicate NCSC NO.");
     }
 
+    const quantity = Number(payload.quantity);
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      throw new Error("Quantity must be a number greater than 0.");
+    }
+
+    const firstName = cleanName_(payload.rankName);
+    const lastName = cleanName_(payload.surname);
+    const militaryId = cleanDigits_(payload.serviceNumber);
+    const bloodGroup = String(payload.bloodGroup || "").toUpperCase();
+    const secret = String(payload.secretCode || "").toUpperCase();
+
     const folder = getOrCreateFolder_();
-    const filenameBase = `NCSC86-${String(ncscNumber).padStart(2, "0")}-${payload.secretCode}`;
+    const filenameBase = `NCSC86-${String(ncscNumber).padStart(2, "0")}-${secret}`;
     const frontUrl = saveImage_(folder, `${filenameBase}-front.png`, payload.frontImage);
     const backUrl = saveImage_(folder, `${filenameBase}-back.png`, payload.backImage);
     const downloadLinks = `Front: ${frontUrl}\nBack: ${backUrl}`;
 
     sheet.appendRow([
       new Date(),
-      payload.rankName,
-      payload.surname,
-      payload.serviceNumber,
+      firstName,
+      lastName,
+      militaryId,
       ncscNumber,
-      payload.bloodGroup,
-      payload.secretCode,
+      bloodGroup,
+      quantity,
+      secret,
       frontUrl,
       backUrl,
       downloadLinks,
@@ -54,14 +66,20 @@ function doGet(e) {
 
   if (e.parameter.code) {
     const code = String(e.parameter.code).toUpperCase();
-    const row = values.find((item) => String(item[6]).toUpperCase() === code);
+    const row = values.find((item) => String(item[7]).toUpperCase() === code);
     const result = row
       ? {
           ok: true,
           name: `${row[1]} ${row[2]}`.trim(),
-          secretCode: row[6],
-          frontUrl: row[7],
-          backUrl: row[8],
+          firstName: row[1],
+          lastName: row[2],
+          serviceNumber: row[3],
+          ncscNumber: row[4],
+          bloodGroup: row[5],
+          quantity: row[6],
+          secretCode: row[7],
+          frontUrl: row[8],
+          backUrl: row[9],
         }
       : { ok: false, error: "Secret code not found" };
 
@@ -69,10 +87,18 @@ function doGet(e) {
   }
 
   const rows = values
-    .filter((row) => row[1] && row[6])
+    .filter((row) => row[1] && row[4])
     .map((row) => ({
       name: `${row[1]} ${row[2]}`.trim(),
-      secretCode: row[6],
+      firstName: row[1],
+      lastName: row[2],
+      serviceNumber: row[3],
+      ncscNumber: row[4],
+      bloodGroup: row[5],
+      quantity: row[6],
+      secretCode: row[7],
+      frontUrl: row[8],
+      backUrl: row[9],
     }));
 
   return output_(e, { ok: true, rows });
@@ -95,16 +121,17 @@ function getSheet_() {
 
 function ensureHeader_(sheet) {
   const headers = [
-    "วันที่บันทึก",
-    "ชื่อ",
-    "นามสกุล",
-    "เลขอัตราข้าราชการ",
+    "CREATED AT",
+    "FIRST NAME",
+    "LAST NAME",
+    "MILITARY ID",
     "NCSC NO.",
-    "หมู่เลือด",
-    "รหัสลับ",
-    "ลิงก์ภาพด้านหน้า",
-    "ลิงก์ภาพด้านหลัง",
-    "ลิงก์ดาวน์โหลดภาพ",
+    "BLOOD GROUP",
+    "QUANTITY",
+    "SECRET CODE",
+    "FRONT IMAGE LINK",
+    "BACK IMAGE LINK",
+    "DOWNLOAD LINKS",
   ];
 
   if (sheet.getLastRow() === 0 || sheet.getRange(1, 1).getValue() !== headers[0]) {
@@ -134,6 +161,14 @@ function saveImage_(folder, filename, dataUrl) {
   const file = folder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return file.getDownloadUrl();
+}
+
+function cleanName_(value) {
+  return String(value || "").toUpperCase().replace(/[^A-Z ]/g, "").replace(/\s{2,}/g, " ").trim();
+}
+
+function cleanDigits_(value) {
+  return String(value || "").replace(/\D/g, "");
 }
 
 function json_(data) {

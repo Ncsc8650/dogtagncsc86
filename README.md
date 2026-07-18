@@ -1,31 +1,28 @@
 # NCSC86 Dog Tag Order
 
-เว็บฟอร์มสำหรับบันทึกคำสั่งทำ dog tag รุ่น NCSC86 พร้อม preview 3D, สร้างภาพ PNG ด้านหน้าและด้านหลัง, และบันทึกข้อมูลลง Google Sheets
+Web form for NCSC86 dog tag orders with a 3D preview, PNG front/back rendering, saved order list, and optional Google Sheets storage.
 
-## ใช้งานบนเครื่อง
+## Local Use
 
 ```bash
-node server.js
+pnpm install
+pnpm start
 ```
 
-หรือเปิดผ่าน static server อื่นจากโฟลเดอร์นี้ได้เลย
+The local server runs on `http://localhost:4173` by default.
 
-## เชื่อม Google Sheets
+## Google Sheets
 
-1. เปิด Google Apps Script แล้วสร้างโปรเจกต์ใหม่
-2. วางโค้ดจาก `scripts/google-apps-script.gs`
-3. Deploy เป็น Web app
-4. ตั้งค่า Execute as เป็นบัญชีของคุณ และ Who has access เป็น Anyone with the link
-5. คัดลอก Web app URL ไปใส่ใน `app.js` ตรง `GOOGLE_SCRIPT_URL`
+1. Open Google Apps Script and create a new project.
+2. Paste the code from `scripts/google-apps-script.gs`.
+3. Deploy it as a Web app.
+4. Set `Execute as` to your account and `Who has access` to `Anyone with the link`.
+5. Copy the Web app URL into `GOOGLE_SCRIPT_URL` in `app.js`.
 
-Google Sheet ที่ตั้งไว้:
+Configured Google Sheet:
 
-```text
-https://docs.google.com/spreadsheets/d/1bEdeom9G5LzamOw0Jm11Ko9ZwbUDggfJkWy5Ehql9Yg/edit
-```
+https://docs.google.com/spreadsheets/d/1bEdeom9G5LzamOw0Jm11Ko9ZwbUDggfJkWy5Ehql9Yg/edit?usp=sharing
 
-หัวตารางที่ใช้:
+Expected columns:
 
-```text
-วันที่บันทึก | ยศ-ชื่อ | นามสกุล | เลขอัตราข้าราชการ | NCSC NO. | หมู่เลือด | รหัสลับ | ลิงก์ภาพด้านหน้า | ลิงก์ภาพด้านหลัง | ลิงก์ดาวน์โหลดภาพ
-```
+CREATED AT | FIRST NAME | LAST NAME | MILITARY ID | NCSC NO. | BLOOD GROUP | QUANTITY | SECRET CODE | FRONT IMAGE LINK | BACK IMAGE LINK | DOWNLOAD LINKS

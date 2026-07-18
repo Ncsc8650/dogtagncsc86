@@ -15,7 +15,6 @@ const secretCode = document.querySelector("#secretCode");
 const ordersBody = document.querySelector("#ordersBody");
 const renderCanvas = document.querySelector("#renderCanvas");
 const imageDialog = document.querySelector("#imageDialog");
-const lookupCode = document.querySelector("#lookupCode");
 
 const fields = {
   rankName: document.querySelector("#rankName"),
@@ -23,6 +22,7 @@ const fields = {
   serviceNumber: document.querySelector("#serviceNumber"),
   ncscNumber,
   bloodGroup: document.querySelector("#bloodGroup"),
+  quantity: document.querySelector("#quantity"),
 };
 
 let activeSide = "front";
@@ -36,21 +36,15 @@ const localImageStore = new Map();
 init();
 
 function init() {
-  for (let i = 1; i <= 70; i += 1) {
-    const option = document.createElement("option");
-    option.value = String(i);
-    option.textContent = String(i).padStart(2, "0");
-    ncscNumber.append(option);
-  }
-
   compactStoredOrders();
-  ncscNumber.value = getNextNcscNumber();
+  refreshNcscOptions();
+  fields.quantity.value = fields.quantity.value || "1";
   secretCode.value = createSecretCode();
   updatePreview();
   renderOrders();
   loadRemoteOrders();
   if (!GOOGLE_SCRIPT_URL) {
-    statusText.textContent = "ยังไม่ได้เชื่อม Google Sheets: ตอนนี้ข้อมูลจะอยู่เฉพาะในเครื่องนี้";
+    statusText.textContent = "Google Sheets is not connected yet. Orders are stored on this device only.";
     statusText.classList.add("error");
   }
   bindEvents();
@@ -61,9 +55,15 @@ function init() {
 }
 
 function bindEvents() {
-  Object.values(fields).forEach((field) => {
-    field.addEventListener("input", updatePreview);
-    field.addEventListener("change", updatePreview);
+  Object.entries(fields).forEach(([key, field]) => {
+    field.addEventListener("input", () => {
+      sanitizeField(key);
+      updatePreview();
+    });
+    field.addEventListener("change", () => {
+      sanitizeField(key);
+      updatePreview();
+    });
   });
 
   form.addEventListener("submit", saveOrder);
@@ -85,37 +85,48 @@ function bindEvents() {
     downloadDataUrl(await renderDogTag("back"), makeFilename("back"));
   });
 
-  document.querySelector("#lookupButton").addEventListener("click", openBySecretCode);
-  lookupCode.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      openBySecretCode();
-    }
-  });
-
   document.querySelector("#closeDialog").addEventListener("click", () => imageDialog.close());
   stage.addEventListener("pointerdown", startDrag);
   window.addEventListener("pointermove", dragModel);
   window.addEventListener("pointerup", stopDrag);
 }
 
+function sanitizeField(key) {
+  const field = fields[key];
+  if (!field) return;
+
+  if (key === "rankName" || key === "surname") {
+    field.value = field.value.toLocaleUpperCase("en-US").replace(/[^A-Z ]/g, "").replace(/\s{2,}/g, " ");
+  }
+
+  if (key === "serviceNumber" || key === "quantity") {
+    field.value = field.value.replace(/\D/g, "");
+  }
+}
+
 function getFormData() {
   return {
-    rankName: fields.rankName.value.trim(),
-    surname: fields.surname.value.trim(),
-    serviceNumber: fields.serviceNumber.value.trim(),
+    rankName: normalizeName(fields.rankName.value),
+    surname: normalizeName(fields.surname.value),
+    serviceNumber: fields.serviceNumber.value.replace(/\D/g, ""),
     ncscNumber: Number(fields.ncscNumber.value),
-    bloodGroup: fields.bloodGroup.value,
+    bloodGroup: fields.bloodGroup.value.toLocaleUpperCase("en-US"),
+    quantity: Number(fields.quantity.value),
     secretCode: secretCode.value || createSecretCode(),
   };
 }
 
+function normalizeName(value) {
+  return String(value || "").toLocaleUpperCase("en-US").replace(/[^A-Z ]/g, "").replace(/\s{2,}/g, " ").trim();
+}
+
 function updatePreview() {
   const data = getFormData();
-  setPreviewText("rankName", data.rankName || "ชื่อ");
-  setPreviewText("surname", data.surname || "นามสกุล");
+  setPreviewText("rankName", data.rankName || "FIRST NAME");
+  setPreviewText("surname", data.surname || "LAST NAME");
   setPreviewText("serviceNumber", data.serviceNumber || "0000000000");
   setPreviewText("ncscNumber", formatNcsc(data.ncscNumber));
-  setPreviewText("bloodGroup", `Blood group: ${data.bloodGroup}`);
+  setPreviewText("bloodGroup", `BLOOD GROUP: ${data.bloodGroup || "A"}`);
 }
 
 function setPreviewText(key, value) {
@@ -127,6 +138,7 @@ async function saveOrder(event) {
   event.preventDefault();
   statusText.className = "status-text";
 
+  Object.keys(fields).forEach(sanitizeField);
   const data = getFormData();
   const validation = validateOrder(data);
   if (validation) {
@@ -135,7 +147,7 @@ async function saveOrder(event) {
     return;
   }
 
-  statusText.textContent = "กำลังสร้างภาพ...";
+  statusText.textContent = "Generating images...";
   const frontImage = await renderDogTag("front", data);
   const backImage = await renderDogTag("back", data);
   const order = {
@@ -147,15 +159,16 @@ async function saveOrder(event) {
   };
 
   addLocalOrder(order);
+  refreshNcscOptions();
   renderOrders();
 
   if (GOOGLE_SCRIPT_URL) {
-    statusText.textContent = "กำลังบันทึกลง Google Sheets...";
+    statusText.textContent = "Saving to Google Sheets...";
     await postToGoogleSheet(order);
     await loadRemoteOrders();
-    statusText.textContent = `บันทึกแล้ว รหัสลับ ${order.secretCode}`;
+    statusText.textContent = "Order saved.";
   } else {
-    statusText.textContent = `ยังไม่เข้า Google Sheets: บันทึกเฉพาะในเครื่องนี้ รหัสลับ ${order.secretCode}`;
+    statusText.textContent = "Not sent to Google Sheets yet. This order is stored on this device only.";
     statusText.className = "status-text error";
   }
 
@@ -165,17 +178,21 @@ async function saveOrder(event) {
 }
 
 function validateOrder(data) {
-  if (!data.rankName || !data.surname || !data.serviceNumber || !data.ncscNumber || !data.bloodGroup) {
-    return "กรอกข้อมูลให้ครบทั้ง 5 รายการก่อนบันทึก";
+  if (!data.rankName || !data.surname || !data.serviceNumber || !data.ncscNumber || !data.bloodGroup || !data.quantity) {
+    return "Please complete all fields before saving.";
   }
 
   if (data.ncscNumber < 1 || data.ncscNumber > 70) {
-    return "NCSC NO. ต้องอยู่ระหว่าง 1 ถึง 70";
+    return "NCSC No. must be between 1 and 70.";
   }
 
-  const duplicate = getOrders().find((order) => Number(order.ncscNumber) === data.ncscNumber);
+  if (!Number.isInteger(data.quantity) || data.quantity < 1) {
+    return "Quantity must be a number greater than 0.";
+  }
+
+  const duplicate = getKnownOrders().find((order) => Number(order.ncscNumber) === data.ncscNumber);
   if (duplicate) {
-    return `NCSC NO. ${String(data.ncscNumber).padStart(2, "0")} ถูกใช้ในเครื่องนี้แล้ว`;
+    return `NCSC No. ${String(data.ncscNumber).padStart(2, "0")} is already used.`;
   }
 
   return "";
@@ -206,7 +223,7 @@ function drawEngraving(ctx, canvas, data) {
     data.surname,
     data.serviceNumber,
     formatNcsc(data.ncscNumber),
-    `Blood group: ${data.bloodGroup}`,
+    `BLOOD GROUP: ${data.bloodGroup}`,
   ];
 
   const x = canvas.width * 0.29;
@@ -220,7 +237,7 @@ function drawEngraving(ctx, canvas, data) {
   ctx.textAlign = "left";
 
   lines.forEach((line, index) => {
-    drawFitText(ctx, line.toLocaleUpperCase("th-TH"), x, startY + index * lineHeight, maxWidth, baseSize);
+    drawFitText(ctx, line.toLocaleUpperCase("en-US"), x, startY + index * lineHeight, maxWidth, baseSize);
   });
 }
 
@@ -258,6 +275,7 @@ async function postToGoogleSheet(order) {
     serviceNumber: order.serviceNumber,
     ncscNumber: order.ncscNumber,
     bloodGroup: order.bloodGroup,
+    quantity: order.quantity,
     secretCode: order.secretCode,
     frontImage: order.frontImage,
     backImage: order.backImage,
@@ -276,14 +294,27 @@ async function loadRemoteOrders() {
   try {
     const response = await jsonpRequest({});
     remoteOrders = (response.rows || []).map((row) => ({
-      displayName: row.name,
-      secretCode: row.secretCode,
+      displayName: normalizeDisplayName(row.name),
+      rankName: normalizeName(row.firstName),
+      surname: normalizeName(row.lastName),
+      serviceNumber: String(row.serviceNumber || "").replace(/\D/g, ""),
+      ncscNumber: Number(row.ncscNumber),
+      bloodGroup: String(row.bloodGroup || "").toLocaleUpperCase("en-US"),
+      quantity: Number(row.quantity) || 1,
+      secretCode: String(row.secretCode || ""),
+      frontImage: row.frontUrl || row.frontImage || "",
+      backImage: row.backUrl || row.backImage || "",
       remoteOnly: true,
     }));
+    refreshNcscOptions();
     renderOrders();
   } catch {
     remoteOrders = [];
   }
+}
+
+function normalizeDisplayName(value) {
+  return String(value || "").toLocaleUpperCase("en-US").replace(/[^A-Z ]/g, "").replace(/\s{2,}/g, " ").trim();
 }
 
 function setSide(side) {
@@ -326,21 +357,66 @@ function resetForm() {
 }
 
 function resetForNextOrder() {
-  ncscNumber.value = getNextNcscNumber();
+  refreshNcscOptions();
+  fields.quantity.value = "1";
   secretCode.value = createSecretCode();
   updatePreview();
 }
 
+function refreshNcscOptions(preferredValue = ncscNumber.value) {
+  const used = getUsedNcscNumbers();
+  const preferred = Number(preferredValue);
+  ncscNumber.innerHTML = "";
+
+  for (let i = 1; i <= 70; i += 1) {
+    if (used.has(i)) continue;
+    const option = document.createElement("option");
+    option.value = String(i);
+    option.textContent = String(i).padStart(2, "0");
+    ncscNumber.append(option);
+  }
+
+  if (!ncscNumber.options.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "All numbers used";
+    ncscNumber.append(option);
+    ncscNumber.disabled = true;
+    return;
+  }
+
+  ncscNumber.disabled = false;
+  if (preferred && !used.has(preferred)) {
+    ncscNumber.value = String(preferred);
+  } else {
+    ncscNumber.value = getNextNcscNumber();
+  }
+}
+
 function getNextNcscNumber() {
-  const used = new Set(getOrders().map((order) => Number(order.ncscNumber)));
+  const used = getUsedNcscNumbers();
   for (let i = 1; i <= 70; i += 1) {
     if (!used.has(i)) return String(i);
   }
-  return "1";
+  return "";
+}
+
+function getUsedNcscNumbers() {
+  return new Set(getKnownOrders().map((order) => Number(order.ncscNumber)).filter(Boolean));
+}
+
+function getKnownOrders() {
+  const localOrders = getOrders();
+  const localKeys = new Set(localOrders.map(getOrderKey));
+  return [
+    ...localOrders,
+    ...remoteOrders.filter((order) => !localKeys.has(getOrderKey(order))),
+  ];
 }
 
 function formatNcsc(value) {
-  return `NCSC 86 - ${String(value || 1).padStart(2, "0")}`;
+  if (!value) return "NCSC 86 - --";
+  return `NCSC 86 - ${String(value).padStart(2, "0")}`;
 }
 
 function createSecretCode() {
@@ -371,7 +447,15 @@ function addLocalOrder(order) {
 }
 
 function compactStoredOrders() {
-  const compacted = getOrders().map(({ frontImage, backImage, ...order }) => order);
+  const compacted = getOrders().map(({ frontImage, backImage, ...order }) => ({
+    ...order,
+    rankName: normalizeName(order.rankName),
+    surname: normalizeName(order.surname),
+    displayName: normalizeDisplayName(order.displayName || `${order.rankName || ""} ${order.surname || ""}`),
+    serviceNumber: String(order.serviceNumber || "").replace(/\D/g, ""),
+    bloodGroup: String(order.bloodGroup || "").toLocaleUpperCase("en-US"),
+    quantity: Number(order.quantity) || 1,
+  }));
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(compacted.slice(0, 70)));
   } catch {
@@ -380,69 +464,88 @@ function compactStoredOrders() {
 }
 
 function renderOrders() {
-  const localOrders = getOrders();
-  const localCodes = new Set(localOrders.map((order) => order.secretCode));
-  const orders = [
-    ...localOrders,
-    ...remoteOrders.filter((order) => !localCodes.has(order.secretCode)),
-  ];
+  const orders = getKnownOrders();
   ordersBody.innerHTML = "";
 
   if (!orders.length) {
     const row = document.createElement("tr");
-    row.innerHTML = '<td colspan="2">ยังไม่มีรายการ</td>';
+    row.innerHTML = '<td colspan="4">No saved orders yet.</td>';
     ordersBody.append(row);
     return;
   }
 
   orders.forEach((order) => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${escapeHtml(order.displayName)}</td><td>${escapeHtml(order.secretCode)}</td>`;
-    row.addEventListener("click", () => {
-      lookupCode.value = order.secretCode;
-      openBySecretCode();
+    row.className = "order-row";
+    row.tabIndex = 0;
+    row.innerHTML = `
+      <td>${escapeHtml(order.displayName || `${order.rankName || ""} ${order.surname || ""}`.trim())}</td>
+      <td>${escapeHtml(formatNcsc(order.ncscNumber))}</td>
+      <td>${escapeHtml(order.quantity || 1)}</td>
+      <td><button class="view-button" type="button"><i data-lucide="image"></i><span>View</span></button></td>
+    `;
+    row.addEventListener("click", () => openSavedOrder(order));
+    row.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openSavedOrder(order);
+      }
     });
     ordersBody.append(row);
   });
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 }
 
-async function openBySecretCode() {
-  const code = lookupCode.value.trim().toLocaleUpperCase("en-US");
-  const order = getOrders().find((item) => item.secretCode.toLocaleUpperCase("en-US") === code);
+async function openSavedOrder(order) {
+  statusText.className = "status-text";
 
-  if (order) {
-    const images = localImageStore.get(order.secretCode);
-    if (images) {
-      openOrderDialog({ ...order, ...images });
-      return;
-    }
-  }
+  const localImages = order.secretCode ? localImageStore.get(order.secretCode) : null;
+  const completeOrder = {
+    ...order,
+    frontImage: order.frontImage || order.frontUrl || localImages?.frontImage,
+    backImage: order.backImage || order.backUrl || localImages?.backImage,
+  };
 
-  if (GOOGLE_SCRIPT_URL && code) {
-    try {
-      const remote = await jsonpRequest({ code });
-      if (remote.ok && remote.frontUrl && remote.backUrl) {
-        openOrderDialog({
-          displayName: remote.name,
-          secretCode: remote.secretCode,
-          frontImage: remote.frontUrl,
-          backImage: remote.backUrl,
-        });
+  if (!completeOrder.frontImage || !completeOrder.backImage) {
+    if (completeOrder.rankName && completeOrder.surname && completeOrder.serviceNumber && completeOrder.ncscNumber) {
+      completeOrder.frontImage = await renderDogTag("front", completeOrder);
+      completeOrder.backImage = await renderDogTag("back", completeOrder);
+    } else if (GOOGLE_SCRIPT_URL && completeOrder.secretCode) {
+      try {
+        const remote = await jsonpRequest({ code: completeOrder.secretCode });
+        if (remote.ok && remote.frontUrl && remote.backUrl) {
+          completeOrder.frontImage = remote.frontUrl;
+          completeOrder.backImage = remote.backUrl;
+        }
+      } catch {
+        statusText.textContent = "Could not load images from Google Sheets.";
+        statusText.className = "status-text error";
         return;
       }
-    } catch {
-      statusText.textContent = "อ่านข้อมูลจาก Google Sheets ไม่สำเร็จ";
-      statusText.className = "status-text error";
-      return;
     }
   }
 
-  statusText.textContent = "ไม่พบรหัสลับนี้";
-  statusText.className = "status-text error";
+  if (!completeOrder.frontImage || !completeOrder.backImage) {
+    statusText.textContent = "Images are not available for this order yet.";
+    statusText.className = "status-text error";
+    return;
+  }
+
+  openOrderDialog(completeOrder);
+}
+
+function getOrderKey(order) {
+  if (order.secretCode) return String(order.secretCode).toLocaleUpperCase("en-US");
+  if (order.ncscNumber) return `NCSC-${Number(order.ncscNumber)}`;
+  return `${order.displayName || ""}-${order.createdAt || ""}`;
 }
 
 function openOrderDialog(order) {
-  document.querySelector("#dialogName").textContent = `${order.displayName} | ${order.secretCode}`;
+  const name = order.displayName || `${order.rankName || ""} ${order.surname || ""}`.trim() || "DOG TAG";
+  document.querySelector("#dialogName").textContent = `${name} | ${formatNcsc(order.ncscNumber)}`;
   const front = document.querySelector("#dialogFront");
   const back = document.querySelector("#dialogBack");
   front.href = order.frontImage;

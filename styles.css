@@ -177,6 +177,7 @@ select {
   background: rgba(5, 7, 5, 0.58);
   outline: none;
   padding: 0 14px;
+  text-transform: uppercase;
 }
 
 input:focus,
@@ -188,8 +189,7 @@ select:focus {
 .actions,
 .download-row,
 .preview-toolbar,
-.panel-title,
-.secret-lookup {
+.panel-title {
   display: flex;
   align-items: center;
 }
@@ -400,15 +400,6 @@ button svg {
   border-bottom: 1px solid var(--line);
 }
 
-.secret-lookup {
-  gap: 8px;
-  width: min(100%, 330px);
-}
-
-.secret-lookup input {
-  min-height: 42px;
-}
-
 .table-wrap {
   overflow-x: auto;
 }
@@ -433,6 +424,34 @@ th {
 
 td {
   font-size: 16px;
+}
+
+.order-row {
+  cursor: pointer;
+}
+
+.order-row:hover,
+.order-row:focus-visible {
+  background: rgba(217, 173, 87, 0.08);
+  outline: none;
+}
+
+.view-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.07);
+  font-weight: 800;
+}
+
+.view-button:hover {
+  background: rgba(217, 173, 87, 0.16);
 }
 
 dialog {

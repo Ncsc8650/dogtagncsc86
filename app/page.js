@@ -12,27 +12,27 @@ export default function Page() {
 
           <form id="orderForm" className="order-form" autoComplete="off">
             <div className="field">
-              <label htmlFor="rankName">ชื่อ</label>
-              <input id="rankName" name="rankName" type="text" maxLength="36" placeholder="ชื่อ" required />
+              <label htmlFor="rankName">First Name</label>
+              <input id="rankName" name="rankName" type="text" maxLength="36" placeholder="FIRST NAME" required />
             </div>
 
             <div className="field">
-              <label htmlFor="surname">นามสกุล</label>
-              <input id="surname" name="surname" type="text" maxLength="36" placeholder="นามสกุล" required />
+              <label htmlFor="surname">Last Name</label>
+              <input id="surname" name="surname" type="text" maxLength="36" placeholder="LAST NAME" required />
             </div>
 
             <div className="field">
-              <label htmlFor="serviceNumber">เลขอัตราข้าราชการ</label>
-              <input id="serviceNumber" name="serviceNumber" type="text" inputMode="numeric" maxLength="18" placeholder="เลขอัตราข้าราชการ" required />
+              <label htmlFor="serviceNumber">Military ID</label>
+              <input id="serviceNumber" name="serviceNumber" type="text" inputMode="numeric" maxLength="18" placeholder="MILITARY ID" required />
             </div>
 
             <div className="field-grid">
               <div className="field">
-                <label htmlFor="ncscNumber">NCSC NO.</label>
+                <label htmlFor="ncscNumber">NCSC No.</label>
                 <select id="ncscNumber" name="ncscNumber" required></select>
               </div>
               <div className="field">
-                <label htmlFor="bloodGroup">หมู่เลือด</label>
+                <label htmlFor="bloodGroup">Blood Group</label>
                 <select id="bloodGroup" name="bloodGroup" required>
                   <option value="A">A</option>
                   <option value="B">B</option>
@@ -42,14 +42,19 @@ export default function Page() {
               </div>
             </div>
 
+            <div className="field">
+              <label htmlFor="quantity">Quantity</label>
+              <input id="quantity" name="quantity" type="text" inputMode="numeric" maxLength="3" placeholder="QUANTITY" required />
+            </div>
+
             <input id="secretCode" name="secretCode" type="hidden" />
 
             <div className="actions">
               <button className="primary-button" type="submit">
                 <i data-lucide="save"></i>
-                <span>บันทึกคำสั่งทำ</span>
+                <span>Save Order</span>
               </button>
-              <button className="ghost-button" id="resetButton" type="button" title="ล้างฟอร์ม">
+              <button className="ghost-button" id="resetButton" type="button" title="Reset Form">
                 <i data-lucide="rotate-ccw"></i>
               </button>
             </div>
@@ -60,10 +65,10 @@ export default function Page() {
         <section className="preview-zone" aria-label="Dog tag preview">
           <div className="preview-toolbar">
             <div className="segmented" role="tablist" aria-label="Preview side">
-              <button type="button" className="segment active" data-side="front">หน้า</button>
-              <button type="button" className="segment" data-side="back">หลัง</button>
+              <button type="button" className="segment active" data-side="front">Front</button>
+              <button type="button" className="segment" data-side="back">Back</button>
             </div>
-            <button className="icon-button" id="spinButton" type="button" title="หมุนแท็ก">
+            <button className="icon-button" id="spinButton" type="button" title="Spin Tag">
               <i data-lucide="refresh-cw"></i>
             </button>
           </div>
@@ -76,11 +81,11 @@ export default function Page() {
               <div className="tag-face tag-back">
                 <img src="/assets/images/B-normalized.png" alt="Dog tag back" />
                 <div className="engrave-preview" aria-hidden="true">
-                  <strong data-preview="rankName">ชื่อ</strong>
-                  <strong data-preview="surname">นามสกุล</strong>
+                  <strong data-preview="rankName">FIRST NAME</strong>
+                  <strong data-preview="surname">LAST NAME</strong>
                   <strong data-preview="serviceNumber">0000000000</strong>
                   <strong data-preview="ncscNumber">NCSC 86 - 01</strong>
-                  <strong data-preview="bloodGroup">Blood group: A</strong>
+                  <strong data-preview="bloodGroup">BLOOD GROUP: A</strong>
                 </div>
               </div>
             </div>
@@ -89,31 +94,27 @@ export default function Page() {
           <div className="download-row">
             <button className="ghost-button" id="downloadFront" type="button">
               <i data-lucide="download"></i>
-              <span>ด้านหน้า</span>
+              <span>Front Image</span>
             </button>
             <button className="ghost-button" id="downloadBack" type="button">
               <i data-lucide="download"></i>
-              <span>ด้านหลัง</span>
+              <span>Back Image</span>
             </button>
           </div>
         </section>
 
         <section className="orders-panel" aria-label="Saved orders">
           <div className="panel-title">
-            <h2>รายการที่บันทึกแล้ว</h2>
-            <div className="secret-lookup">
-              <input id="lookupCode" type="text" placeholder="รหัสลับ" />
-              <button id="lookupButton" className="icon-button" type="button" title="ดูภาพ">
-                <i data-lucide="lock-keyhole"></i>
-              </button>
-            </div>
+            <h2>Saved Orders</h2>
           </div>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>ชื่อ</th>
-                  <th>รหัสลับ</th>
+                  <th>Name</th>
+                  <th>NCSC No.</th>
+                  <th>Qty</th>
+                  <th>Images</th>
                 </tr>
               </thead>
               <tbody id="ordersBody"></tbody>
@@ -125,7 +126,7 @@ export default function Page() {
       <dialog id="imageDialog">
         <div className="dialog-head">
           <strong id="dialogName">Dog Tag</strong>
-          <button id="closeDialog" className="icon-button" type="button" title="ปิด">
+          <button id="closeDialog" className="icon-button" type="button" title="Close">
             <i data-lucide="x"></i>
           </button>
         </div>
