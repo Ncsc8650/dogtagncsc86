@@ -12,8 +12,8 @@ export default function Page() {
 
           <form id="orderForm" className="order-form" autoComplete="off">
             <div className="field">
-              <label htmlFor="rankName">ยศ - ชื่อ</label>
-              <input id="rankName" name="rankName" type="text" maxLength="36" placeholder="เช่น ร.ต. สมชาย" required />
+              <label htmlFor="rankName">ชื่อ</label>
+              <input id="rankName" name="rankName" type="text" maxLength="36" placeholder="ชื่อ" required />
             </div>
 
             <div className="field">
@@ -71,12 +71,12 @@ export default function Page() {
           <div className="tag-stage" id="tagStage">
             <div className="tag-model" id="tagModel">
               <div className="tag-face tag-front">
-                <img src="/assets/images/A.png" alt="Dog tag front" />
+                <img src="/assets/images/003.png" alt="Dog tag front" />
               </div>
               <div className="tag-face tag-back">
                 <img src="/assets/images/B.png" alt="Dog tag back" />
                 <div className="engrave-preview" aria-hidden="true">
-                  <strong data-preview="rankName">ยศ ชื่อ</strong>
+                  <strong data-preview="rankName">ชื่อ</strong>
                   <strong data-preview="surname">นามสกุล</strong>
                   <strong data-preview="serviceNumber">0000000000</strong>
                   <strong data-preview="ncscNumber">NCSC 86 - 01</strong>

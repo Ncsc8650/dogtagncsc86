@@ -96,7 +96,7 @@ function getSheet_() {
 function ensureHeader_(sheet) {
   const headers = [
     "วันที่บันทึก",
-    "ยศ-ชื่อ",
+    "ชื่อ",
     "นามสกุล",
     "เลขอัตราข้าราชการ",
     "NCSC NO.",

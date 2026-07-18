@@ -2,7 +2,7 @@ const GOOGLE_SCRIPT_URL = "";
 const STORAGE_KEY = "ncsc86-dogtag-orders";
 
 const imagePaths = {
-  front: "/assets/images/A.png",
+  front: "/assets/images/003.png",
   back: "/assets/images/B.png",
 };
 
@@ -107,7 +107,7 @@ function getFormData() {
 
 function updatePreview() {
   const data = getFormData();
-  setPreviewText("rankName", data.rankName || "ยศ ชื่อ");
+  setPreviewText("rankName", data.rankName || "ชื่อ");
   setPreviewText("surname", data.surname || "นามสกุล");
   setPreviewText("serviceNumber", data.serviceNumber || "0000000000");
   setPreviewText("ncscNumber", formatNcsc(data.ncscNumber));
