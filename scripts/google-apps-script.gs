@@ -116,7 +116,8 @@ function output_(e, data) {
 }
 
 function getSheet_() {
-  return SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  return spreadsheet.getSheetByName(SHEET_NAME) || spreadsheet.getSheets()[0];
 }
 
 function ensureHeader_(sheet) {
