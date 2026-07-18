@@ -2,7 +2,7 @@ const GOOGLE_SCRIPT_URL = window.NCSC_GOOGLE_SCRIPT_URL || "";
 const STORAGE_KEY = "ncsc86-dogtag-orders";
 
 const imagePaths = {
-  front: "/assets/images/003.png",
+  front: "/assets/images/003-normalized.png",
   back: "/assets/images/B-normalized.png",
 };
 
@@ -126,7 +126,7 @@ function updatePreview() {
   setPreviewText("surname", data.surname || "LAST NAME");
   setPreviewText("serviceNumber", data.serviceNumber || "0000000000");
   setPreviewText("ncscNumber", formatNcsc(data.ncscNumber));
-  setPreviewText("bloodGroup", `BLOOD GROUP: ${data.bloodGroup || "A"}`);
+  setPreviewText("bloodGroup", `BLOOD GROUP : ${data.bloodGroup || "A"}`);
 }
 
 function setPreviewText(key, value) {
@@ -223,7 +223,7 @@ function drawEngraving(ctx, canvas, data) {
     data.surname,
     data.serviceNumber,
     formatNcsc(data.ncscNumber),
-    `BLOOD GROUP: ${data.bloodGroup}`,
+    `BLOOD GROUP : ${data.bloodGroup}`,
   ];
 
   const x = canvas.width * 0.29;
@@ -464,7 +464,7 @@ function compactStoredOrders() {
 }
 
 function renderOrders() {
-  const orders = getKnownOrders();
+  const orders = getKnownOrders().sort((a, b) => Number(a.ncscNumber || 999) - Number(b.ncscNumber || 999));
   ordersBody.innerHTML = "";
 
   if (!orders.length) {
@@ -479,10 +479,10 @@ function renderOrders() {
     row.className = "order-row";
     row.tabIndex = 0;
     row.innerHTML = `
-      <td>${escapeHtml(order.displayName || `${order.rankName || ""} ${order.surname || ""}`.trim())}</td>
       <td>${escapeHtml(formatNcsc(order.ncscNumber))}</td>
-      <td>${escapeHtml(order.quantity || 1)}</td>
+      <td>${escapeHtml(order.displayName || `${order.rankName || ""} ${order.surname || ""}`.trim())}</td>
       <td><button class="view-button" type="button"><i data-lucide="image"></i><span>View</span></button></td>
+      <td>${escapeHtml(order.quantity || 1)}</td>
     `;
     row.addEventListener("click", () => openSavedOrder(order));
     row.addEventListener("keydown", (event) => {

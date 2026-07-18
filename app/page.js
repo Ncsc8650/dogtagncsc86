@@ -76,7 +76,7 @@ export default function Page() {
           <div className="tag-stage" id="tagStage">
             <div className="tag-model" id="tagModel">
               <div className="tag-face tag-front">
-                <img src="/assets/images/003.png" alt="Dog tag front" />
+                <img src="/assets/images/003-normalized.png" alt="Dog tag front" />
               </div>
               <div className="tag-face tag-back">
                 <img src="/assets/images/B-normalized.png" alt="Dog tag back" />
@@ -85,7 +85,7 @@ export default function Page() {
                   <strong data-preview="surname">LAST NAME</strong>
                   <strong data-preview="serviceNumber">0000000000</strong>
                   <strong data-preview="ncscNumber">NCSC 86 - 01</strong>
-                  <strong data-preview="bloodGroup">BLOOD GROUP: A</strong>
+                  <strong data-preview="bloodGroup">BLOOD GROUP : A</strong>
                 </div>
               </div>
             </div>
@@ -111,10 +111,10 @@ export default function Page() {
             <table>
               <thead>
                 <tr>
+                  <th>Number</th>
                   <th>Name</th>
-                  <th>NCSC No.</th>
-                  <th>Qty</th>
                   <th>Images</th>
+                  <th>Quantity</th>
                 </tr>
               </thead>
               <tbody id="ordersBody"></tbody>
