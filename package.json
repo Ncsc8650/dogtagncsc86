@@ -3,14 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "node server.js",
+    "build": "node scripts/build-static.mjs",
+    "start": "node server.js"
   },
-  "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
-  },
+  "dependencies": {},
   "devDependencies": {}
 }
